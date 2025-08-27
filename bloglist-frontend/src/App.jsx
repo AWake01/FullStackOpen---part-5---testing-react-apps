@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import ToggleButton from './components/ToggleButton'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
@@ -12,9 +14,9 @@ const App = () => {
   const [user, setUser] = useState(null)
   //Blogs
   const [blogs, setBlogs] = useState([])
-  const [title, setTitle] = useState([])
-  const [author, setAuthor] = useState([])
-  const [url, setUrl] = useState(null)
+  // const [title, setTitle] = useState([])
+  // const [author, setAuthor] = useState([])
+  // const [url, setUrl] = useState(null)
   //Message
   const [message, setMessage] = useState(null)
   const [messageType, setMessageType] = useState("s") // s = success, f = fail
@@ -25,13 +27,15 @@ const App = () => {
     )  
   }, [])
 
-  useEffect(() => {   //Set user intialy from local storage if user was previosly logged in
-    const loggedInUser = window.localStorage.getItem('currentUser')
-    if(loggedInUser) {
-      const user = JSON.parse(loggedInUser)
-      setUser(user)
-      blogService.setToken(user.token)
-    }
+  useEffect(async () => {   //Set user intialy from local storage if user was previosly logged in
+    //async () => {
+      const loggedInUser = window.localStorage.getItem('currentUser')
+      if(loggedInUser) {
+        const user = JSON.parse(loggedInUser)
+        setUser(user)
+        blogService.setToken(user.token)
+      }
+    //}
   }, [])
 
   const handleLogin = async (event) => {  //Called by login button
@@ -57,21 +61,29 @@ const App = () => {
     setUser(null)
   }
 
-  const handleAddBlog = async (event) => {  //Called by create button
-    event.preventDefault()
-    
-    const newBlog = {
-      title: title,
-      author: author,
-      url: url,
-    }
-    console.log(user.token)
-    blogService.create(newBlog).then(returnedBlog => { setBlogs(blogs.concat(returnedBlog))}) //Update blog display
-    showMessage(`a new blog '${newBlog.title}' by ${newBlog.author} added`, "s")
-    setTitle("")
-    setAuthor("")
-    setUrl("")
+  const handleAddBlog = (blogObject) => {  //Called by create button
+    blogService
+      .create(blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+      })
   }
+
+  // const handleAddBlog = async (event) => {  //Called by create button
+  //   event.preventDefault()
+
+  //   const newBlog = {
+  //     title: title,
+  //     author: author,
+  //     url: url,
+  //   }
+  //   console.log(user.token)
+  //   blogService.create(newBlog).then(returnedBlog => { setBlogs(blogs.concat(returnedBlog))}) //Update blog display
+  //   showMessage(`a new blog '${newBlog.title}' by ${newBlog.author} added`, "s")
+  //   setTitle("")
+  //   setAuthor("")
+  //   setUrl("")
+  // }
 
   const showMessage = (message, type) => {  //Show message to user - type: s = success, f = fail
     setMessage(message)
@@ -133,7 +145,9 @@ const App = () => {
         <MessageBar message={message} type={messageType}/>
         <div><label>{`${user.name} has logged in `}</label><input type='button' value="log out" onClick={handleLogout}/></div>
         <br/>
-        {blogForm()}
+        <ToggleButton buttonLabel="new blog">
+          <BlogForm onSubmit={handleAddBlog} createBlogFunction={handleAddBlog}></BlogForm>
+        </ToggleButton>
         <br/>
         {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
