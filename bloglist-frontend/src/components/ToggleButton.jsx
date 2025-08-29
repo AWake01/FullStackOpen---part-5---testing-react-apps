@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useImperativeHandle  } from "react"
 
 const ToggleButton = props => {
   const [visible, setVisible] = useState(false)
@@ -10,14 +10,27 @@ const ToggleButton = props => {
     setVisible(!visible)
   }
 
+  
+  useImperativeHandle(props.ref, () => {
+        return { toggleVisibility }  
+  })
+
+  const toggleIsActive = (value) => {
+    //props.setIsActive(value)
+  }
+
+  const getVisibility = () => {
+    return visible
+  }
+
   return (
     <div>
         <div style={hideWhenVisible}>
-            <button onClick={toggleVisibility}>{props.buttonLabel}</button> 
+            <button onClick={() => { toggleVisibility(); props.setIsActive(true) }}>{props.buttonLabel1}</button> 
         </div>
          <div style={showWhenVisible}>
             {props.children}
-            <button onClick={toggleVisibility}>cancel</button>
+            <button onClick={() => { toggleVisibility(); props.setIsActive(false) }}>{props.buttonLabel2}</button>
          </div> 
     </div>
   )

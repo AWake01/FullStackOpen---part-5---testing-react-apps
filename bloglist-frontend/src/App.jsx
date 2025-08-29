@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import ToggleButton from './components/ToggleButton'
 import BlogForm from './components/BlogForm'
@@ -14,6 +14,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   //Blogs
   const [blogs, setBlogs] = useState([])
+  const blogFormRef = useRef()
   // const [title, setTitle] = useState([])
   // const [author, setAuthor] = useState([])
   // const [url, setUrl] = useState(null)
@@ -25,7 +26,7 @@ const App = () => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
     )  
-  }, [])
+  }, [blogs])
 
   useEffect(async () => {   //Set user intialy from local storage if user was previosly logged in
     //async () => {
@@ -66,6 +67,9 @@ const App = () => {
       .create(blogObject)
       .then(returnedBlog => {
         setBlogs(blogs.concat(returnedBlog))
+        blogFormRef.current.toggleVisibility()
+        console.log(returnedBlog)
+        showMessage(`New blog added`, "p")
       })
   }
 
@@ -145,7 +149,7 @@ const App = () => {
         <MessageBar message={message} type={messageType}/>
         <div><label>{`${user.name} has logged in `}</label><input type='button' value="log out" onClick={handleLogout}/></div>
         <br/>
-        <ToggleButton buttonLabel="new blog">
+        <ToggleButton buttonLabel1="new blog" buttonLabel2="cancel" ref={blogFormRef}>
           <BlogForm onSubmit={handleAddBlog} createBlogFunction={handleAddBlog}></BlogForm>
         </ToggleButton>
         <br/>
