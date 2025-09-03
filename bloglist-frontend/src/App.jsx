@@ -2,10 +2,13 @@ import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import ToggleButton from './components/ToggleButton'
 import BlogForm from './components/BlogForm'
+import BlogList from './components/BlogList'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
 import axios from 'axios'
+//import { jwtDecode } from "jwt-decode";
+//import jwt from "jsonwebtoken"
 
 const App = () => {
   //Login
@@ -14,6 +17,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   //Blogs
   const [blogs, setBlogs] = useState([])
+  const [refresh, setRefresh] = useState()
   const blogFormRef = useRef()
   // const [title, setTitle] = useState([])
   // const [author, setAuthor] = useState([])
@@ -23,28 +27,59 @@ const App = () => {
   const [messageType, setMessageType] = useState("s") // s = success, f = fail
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
-  }, [blogs])
+    getAllBlogs()
+  }, [] )
 
-  useEffect(async () => {   //Set user intialy from local storage if user was previosly logged in
+  useEffect(async () => {   //Set user intialy from local storage if user was previosly logged in and token is still valid
     //async () => {
       const loggedInUser = window.localStorage.getItem('currentUser')
       if(loggedInUser) {
         const user = JSON.parse(loggedInUser)
         setUser(user)
         blogService.setToken(user.token)
+        // if(tokenHasTimedOut()) {  //Check if token has expired and logout
+        //   //console.log("Token expired")
+        //   showMessage("Saved login token has expired", "f")
+        //   window.localStorage.clear()
+        //   setUser(null)
+        // } else {
+        //}
       }
-    //}
   }, [])
+  
+  const getAllBlogs = async (event) => {  //Called by logout button
+    blogService.getAll().then(blogs => {
+        blogs.sort((a, b) => b.likes - a.likes)
+        setBlogs( blogs )
+      }
+    )  
+  }
+
+  const tokenHasTimedOut = async (event) => {  //Check token has not expired: https://stackoverflow.com/questions/46418975/react-how-to-check-if-jwt-is-valid-before-sending-a-post-request
+    const user = JSON.parse(window.localStorage.getItem('currentUser'))
+    const token = user.token
+    console.log(token)
+    const decodedToken = jwt.decode(token)
+    //console.log("Decoded Token", decodedToken);
+    const currentDate = new Date()
+    //JWT expiry is in seconds
+    console.log(decodedToken)
+    console.log(decodedToken.exp, currentDate.getTime())
+    if(decodedToken.exp * 1000 < currentDate.getTime()) {
+      console.log("Token expired")
+      return true
+    }
+    else {
+      console.log("Token valid")
+      return false
+    }
+  }
 
   const handleLogin = async (event) => {  //Called by login button
     event.preventDefault()
 
     try {
       const user = await loginService.login({ username, password }) //Get user returned with valid id from login form
-
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -63,31 +98,32 @@ const App = () => {
   }
 
   const handleAddBlog = (blogObject) => {  //Called by create button
-    blogService
+       blogService
       .create(blogObject)
       .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-        blogFormRef.current.toggleVisibility()
-        console.log(returnedBlog)
-        showMessage(`New blog added`, "p")
-      })
+        // if(returnedBlog.error) {
+        //   showMessage(`Session expired`, "f")
+        // } else {
+          //setBlogs(blogs.concat(returnedBlog))
+          getAllBlogs()
+          blogFormRef.current.toggleVisibility()
+          console.log(returnedBlog)
+          showMessage(`New blog added`, "p")
+        })
   }
 
-  // const handleAddBlog = async (event) => {  //Called by create button
-  //   event.preventDefault()
-
-  //   const newBlog = {
-  //     title: title,
-  //     author: author,
-  //     url: url,
-  //   }
-  //   console.log(user.token)
-  //   blogService.create(newBlog).then(returnedBlog => { setBlogs(blogs.concat(returnedBlog))}) //Update blog display
-  //   showMessage(`a new blog '${newBlog.title}' by ${newBlog.author} added`, "s")
-  //   setTitle("")
-  //   setAuthor("")
-  //   setUrl("")
-  // }
+  const handleDeleteBlog = (blogObject) => {  //Called by remove button
+      if(window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`))
+      {
+        console.log("clicked remove")
+    
+        blogService
+        .deleteBlog(blogObject)
+        .then(returnedBlog => {
+          getAllBlogs()
+      })
+    }
+  }
 
   const showMessage = (message, type) => {  //Show message to user - type: s = success, f = fail
     setMessage(message)
@@ -96,14 +132,6 @@ const App = () => {
         setMessage(null)
       }, 5000)
   }
-
-  // const loginForm = () => (  //Show only when user is not logged in
-  //     <form onSubmit={handleLogin}>
-  //       <div>username <input type='text' value={username} name={"username"} onChange={({ target }) => setUsername(target.value)}/></div>
-  //       <div>password <input type='text' value={password} name={"password"} onChange={({ target }) => setPassword(target.value)}/></div>
-  //       <button type="submit">login</button>
-  //     </form>
-  // )
 
   const blogForm = () => {  //Show only when user is not logged in
     return (
@@ -153,9 +181,7 @@ const App = () => {
           <BlogForm onSubmit={handleAddBlog} createBlogFunction={handleAddBlog}></BlogForm>
         </ToggleButton>
         <br/>
-        {blogs.map(blog =>
-          <Blog key={blog.id} blog={blog} />
-        )}
+        <BlogList blogs={blogs} deleteBlog={handleDeleteBlog}></BlogList>
       </div>
     )
   }

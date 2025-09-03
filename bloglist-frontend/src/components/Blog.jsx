@@ -32,7 +32,7 @@ const buttonLineStyle = {
   alignItems: "center"
 }
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, deleteBlog }) => {
   const blogFormRef = useRef()
   const [isActive, setIsActive] = useState(false) //Passed to child and set. Used to show full/summary details
   
@@ -43,12 +43,12 @@ const Blog = ({ blog }) => {
         <i>{blog.author}</i>
         <ToggleButton buttonLabel1="view" buttonLabel2="hide" ref={blogFormRef} setIsActive={setIsActive}></ToggleButton>
       </div> 
-      {isActive ? <BlogDetailed blog={blog}/> : null}
+      {isActive ? <BlogDetailed blog={blog} deleteBlog={deleteBlog}/> : null}
     </div>
   )
 }
 
-const BlogDetailed = ({ blog}) => {
+const BlogDetailed = ({ blog, deleteBlog}) => {
   const blogFormRef = useRef()
   const [likes, setLikes] = useState(blog.likes)
 
@@ -61,13 +61,23 @@ const BlogDetailed = ({ blog}) => {
       .then(returnedBlog => {
         setLikes(returnedBlog.likes)
       })
-}
+  }
+
+  const userCanDelete = (blogObject) => {  //Called by like button
+    const currentUser = JSON.parse(window.localStorage.getItem('currentUser'))
+    if(!blog.user){return false}
+    return blogObject.user.id === currentUser.id ? true : false
+  }
+
   //stopPropagation() prevents parent 'view' button firing 'like' onClick function (event bubbling)
   return (
     <div>
       <a style={lineStyle} href={blog.url}>{blog.url}</a>
-      <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();handleAddLike(blog) }}>Like</button></div>  
-      {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}  
+      <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();handleAddLike(blog) }}>like</button></div>  
+      {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}
+      {console.log("Blog, ", blog)}
+      {userCanDelete(blog) ? <div><button onClick={(e) => { e.stopPropagation(); deleteBlog(blog)}}>remove</button></div> : null}
+      {/* <div><button onClick={(e) => { e.stopPropagation(); deleteBlog(blog)}}>remove</button></div> */}
     </div>  
   )
 }
