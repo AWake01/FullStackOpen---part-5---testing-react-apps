@@ -17,6 +17,7 @@ const App = () => {
   const [user, setUser] = useState(null)
   //Blogs
   const [blogs, setBlogs] = useState([])
+  const { blogsOpen, setBlogsOpen } = useState(0)
   const blogFormRef = useRef()
   // const [title, setTitle] = useState([])
   // const [author, setAuthor] = useState([])
@@ -50,8 +51,7 @@ const App = () => {
     blogService.getAll().then(blogs => {
       blogs.sort((a, b) => b.likes - a.likes)
       setBlogs( blogs )
-    }
-    )
+    })
   }
 
   // const tokenHasTimedOut = async (event) => {  //Check token has not expired: https://stackoverflow.com/questions/46418975/react-how-to-check-if-jwt-is-valid-before-sending-a-post-request
@@ -124,6 +124,18 @@ const App = () => {
     }
   }
 
+  const handleAddLike = (blogObject) => {  //Called by like button
+    const newBlog = blogObject
+    newBlog.likes += 1
+
+    blogService
+      .put(newBlog)
+      .then(returnedBlog => {
+        console.log('Likes: ', returnedBlog.title, ' ', returnedBlog.author, ' ', returnedBlog.likes)
+        getAllBlogs()
+      })
+  }
+
   const showMessage = (message, type) => {  //Show message to user - type: s = success, f = fail
     setMessage(message)
     setMessageType(type)
@@ -166,10 +178,10 @@ const App = () => {
         <div><label>{`${user.name} has logged in `}</label><input type='button' value="log out" onClick={handleLogout}/></div>
         <br/>
         <ToggleButton buttonLabel1="new blog" buttonLabel2="cancel" ref={blogFormRef}>
-          <BlogForm onSubmit={handleAddBlog} createBlogFunction={handleAddBlog}></BlogForm>
+          <BlogForm addBlogFunction={handleAddBlog}></BlogForm>
         </ToggleButton>
         <br/>
-        <BlogList blogs={blogs} deleteBlog={handleDeleteBlog}></BlogList>
+        <BlogList blogs={blogs} deleteBlog={handleDeleteBlog} likeBlog={handleAddLike}></BlogList>
       </div>
     )
   }
