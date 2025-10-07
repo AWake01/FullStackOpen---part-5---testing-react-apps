@@ -1,14 +1,14 @@
-import { useState, useImperativeHandle  } from 'react'
+import { useState, useImperativeHandle  } from "react"
 import Blog from './Blog'
 
-const BlogList = ({ blogs, deleteBlog, likeBlog }) => {
-
+const BlogList = ({ blogs, deleteBlog}) => {
+  
 
   return (
     <div>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} likeBlog={likeBlog} />
-      )}
+         {blogs.map(blog =>
+          <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} />
+        )}    
     </div>
   )
 }

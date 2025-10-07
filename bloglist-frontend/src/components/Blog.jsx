@@ -32,25 +32,21 @@ const buttonLineStyle = {
   alignItems: 'center'
 }
 
-const Blog = ({ blog, deleteBlog, likeBlog }) => {
+const Blog = ({ blog, deleteBlog }) => {
   const blogFormRef = useRef()
   const [isActive, setIsActive] = useState(false) //Passed to child and set. Used to show full/summary details
 
   const [likes, setLikes] = useState(blog.likes)
 
-  // const handleAddLike = (blogObject) => {  //Called by like button
-  //   const newBlog = blogObject
-  //   newBlog.likes += 1
+  const handleAddLike = (blogObject) => {  //Called by like button
+    const newBlog = blogObject
+    newBlog.likes += 1
 
-  //   blogService
-  //     .put(newBlog)
-  //     .then(returnedBlog => {
-  //       setLikes(returnedBlog.likes)
-  //     })
-  // }
-
-  const addLike = () => {  //Called by like button
-    setLikes(likes + 1)
+    blogService
+      .put(newBlog)
+      .then(returnedBlog => {
+        setLikes(returnedBlog.likes)
+      })
   }
 
   const userCanDelete = (blogObject) => {  //Called by like button
@@ -63,7 +59,7 @@ const Blog = ({ blog, deleteBlog, likeBlog }) => {
     return (
       <div>
         <a style={lineStyle} href={blog.url}>{blog.url}</a>
-        <div style={buttonLineStyle}>likes {blog.likes}<button onClick={(e) => { e.stopPropagation();likeBlog(blog) }}>like</button></div>
+        <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();handleAddLike(blog) }}>like</button></div>
         {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}
         {console.log('Blog, ', blog)}
         {userCanDelete(blog) ? <div><button onClick={(e) => { e.stopPropagation(); deleteBlog(blog)}}>remove</button></div> : null}
@@ -85,22 +81,21 @@ const Blog = ({ blog, deleteBlog, likeBlog }) => {
   )
 }
 
-const BlogDetailed = ({ blog, deleteBlog, likeBlog }) => {
+const BlogDetailed = ({ blog, deleteBlog }) => {
   const [likes, setLikes] = useState(blog.likes)
 
-  // const handleAddLike = (blogObject) => {  //Called by like button
-  //   const newBlog = blogObject
-  //   newBlog.likes += 1
+  const handleAddLike = (blogObject) => {  //Called by like button
+    const newBlog = blogObject
+    newBlog.likes += 1
 
-  //   blogService
-  //     .put(newBlog)
-  //     .then(returnedBlog => {
-  //       //setLikes(returnedBlog.likes)
-  //       getA
-  //     })
-  // }
+    blogService
+      .put(newBlog)
+      .then(returnedBlog => {
+        setLikes(returnedBlog.likes)
+      })
+  }
 
-  const userCanDelete = (blogObject) => {  //Called by delete button
+  const userCanDelete = (blogObject) => {  //Called by like button
     const currentUser = JSON.parse(window.localStorage.getItem('currentUser'))
     if(!blog.user){return false}
     return blogObject.user.id === currentUser.id ? true : false
@@ -110,7 +105,7 @@ const BlogDetailed = ({ blog, deleteBlog, likeBlog }) => {
   return (
     <div>
       <a style={lineStyle} href={blog.url}>{blog.url}</a>
-      <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();likeBlog(blog) }}>like</button></div>
+      <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();handleAddLike(blog) }}>like</button></div>
       {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}
       {console.log('Blog, ', blog)}
       {userCanDelete(blog) ? <div><button onClick={(e) => { e.stopPropagation(); deleteBlog(blog)}}>remove</button></div> : null}
