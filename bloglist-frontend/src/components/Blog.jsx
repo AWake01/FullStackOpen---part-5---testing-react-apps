@@ -1,6 +1,6 @@
 import ToggleButton from './ToggleButton'
 import blogService from '../services/blogs'
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 
 const blogStyle = {
   paddingTop: 5,
@@ -11,9 +11,41 @@ const blogStyle = {
   margin: 5,
   gap: 5,
 
-  // display: "flex",
-  // alignItems: "center"
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'start',
 }
+
+const blogShort = {
+  paddingTop: 5,
+  paddingBottom: 5,
+  paddingLeft: 10,
+  border: 'solid',
+  borderWidth: 1,
+  margin: 5,
+  gap: 5,
+
+  display: 'flex',
+  justifyContent: 'start',
+}
+
+const blogFull = {
+  paddingTop: 5,
+  paddingBottom: 5,
+  paddingLeft: 10,
+  border: 'solid',
+  borderWidth: 1,
+  margin: 5,
+  gap: 5,
+
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'left',
+
+  position: 'absolute',
+  bottom: 0,
+}
+
 
 const lineStyle = {
   margin: 0,
@@ -33,7 +65,7 @@ const buttonLineStyle = {
 }
 
 const Blog = ({ blog, deleteBlog }) => {
-  const blogFormRef = useRef()
+  const blogRef = useRef()
   const [isActive, setIsActive] = useState(false) //Passed to child and set. Used to show full/summary details
 
   const [likes, setLikes] = useState(blog.likes)
@@ -57,7 +89,7 @@ const Blog = ({ blog, deleteBlog }) => {
 
   const blogDetails = () => {  //Called by like button
     return (
-      <div>
+      <div className='blog-details-div'>
         <a style={lineStyle} href={blog.url}>{blog.url}</a>
         <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();handleAddLike(blog) }}>like</button></div>
         {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}
@@ -68,14 +100,22 @@ const Blog = ({ blog, deleteBlog }) => {
     )
   }
 
+  const callbackSetIsActive = (value) => {
+    setIsActive(value)
+  }
+
+  const handleVisible = useCallback(() => {
+    console.log('Callback')
+    setIsActive(!isActive)
+  }, [isActive])
+
   return (
-    <div style={blogStyle}>
+    <div style={blogStyle} className='blog-div'>
       <div style={buttonLineStyle}>
         <u>{blog.title}</u>
         <i>{blog.author}</i>
-        <ToggleButton buttonLabel1="view" buttonLabel2="hide" ref={blogFormRef} setIsActive={setIsActive}></ToggleButton>
+        <ToggleButton buttonLabel1="view" buttonLabel2="hide" ref={blogRef} isVisible={isActive} handleVisible={handleVisible}></ToggleButton>
       </div>
-      {/* {isActive ? <BlogDetailed blog={blog} deleteBlog={deleteBlog}/> : null} */}
       {isActive ? blogDetails() : null}
     </div>
   )
@@ -103,7 +143,7 @@ const BlogDetailed = ({ blog, deleteBlog }) => {
 
   //stopPropagation() prevents parent 'view' button firing 'like' onClick function (event bubbling)
   return (
-    <div>
+    <div className='blog-details-div'>
       <a style={lineStyle} href={blog.url}>{blog.url}</a>
       <div style={buttonLineStyle}>likes {likes}<button onClick={(e) => { e.stopPropagation();handleAddLike(blog) }}>like</button></div>
       {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}

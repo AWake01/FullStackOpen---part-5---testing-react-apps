@@ -152,8 +152,8 @@ const App = () => {
         <h2>Log in to application</h2>
         <MessageBar message={message} type={messageType}/>
         <form onSubmit={handleLogin}>
-          <div>username <input type='text' value={username} name={'username'} onChange={({ target }) => setUsername(target.value)}/></div>
-          <div>password <input type='text' value={password} name={'password'} onChange={({ target }) => setPassword(target.value)}/></div>
+          <div><label for="username">username <input type='text' value={username} name={'username'} onChange={({ target }) => setUsername(target.value)}/></label></div>
+          <div><label for="password">password <input type='text' value={password} name={'password'} onChange={({ target }) => setPassword(target.value)}/></label></div>
           <button type="submit">login</button>
         </form>
       </div>
@@ -163,7 +163,7 @@ const App = () => {
       <div>
         <h2>blogs</h2>
         <MessageBar message={message} type={messageType}/>
-        <div><label>{`${user.name} has logged in `}</label><input type='button' value="log out" onClick={handleLogout}/></div>
+        <div><label>{`${user.name} has logged in `}</label><button type='submit' onClick={handleLogout}>log out</button></div>
         <br/>
         <ToggleButton buttonLabel1="new blog" buttonLabel2="cancel" ref={blogFormRef}>
           <BlogForm onSubmit={handleAddBlog} createBlogFunction={handleAddBlog}></BlogForm>

@@ -13,15 +13,18 @@ const BlogForm = ({ createBlogFunction, }) => {
       author: author,
       url: url,
     })
+    //Reset form
+    setTitle('')
+    setAuthor('')
+    setUrl('')
   }
 
   return (
     <div>
       <form onSubmit={addBlog}>
-        {/* <div>title: <input type='text' value={title} name={"title"} onChange={({ target }) => setTitle(target.value)}/></div> */}
-        <div>title: <input type='text' value={title} name={'title'} onChange={event => setTitle(event.target.value)}/></div>
-        <div>author: <input type='text' value={author} name={'author'} onChange={event => setAuthor(event.target.value)}/></div>
-        <div>url: <input type='text' value={url} name={'url'} onChange={event =>  setUrl(event.target.value)}/></div>
+        <div><label htmlFor="title">title: <input type='text' value={title} name={'title'} onChange={event => setTitle(event.target.value)}/></label></div>
+        <div><label htmlFor="author">author: <input type='text' value={author} name={'author'} onChange={event => setAuthor(event.target.value)}/></label></div>
+        <div><label htmlFor="url">url: <input type='text' value={url} name={'url'} onChange={event =>  setUrl(event.target.value)}/></label></div>
         <button type="submit">create</button>
       </form>
     </div>
