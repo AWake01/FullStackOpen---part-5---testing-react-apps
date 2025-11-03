@@ -1,20 +1,20 @@
 .message-success-div {
-    border: 5px solid green;
-    border-radius: 5px;
-    font-size: larger;
-    color: green;
-    margin: 10px 0px;
-    padding: 0px;
+  border: 5px solid green;
+  border-radius: 5px;
+  font-size: larger;
+  color: green;
+  margin: 10px 0px;
+  padding: 0px;
 }
 .message-fail-div {
-    border: 5px solid red;
-    border-radius: 5px;
-    font-size: larger;
-    color: red;
-    margin: 10px 0px;
-    padding: 0px;
+  border: 5px solid red;
+  border-radius: 5px;
+  font-size: larger;
+  color: red;
+  margin: 10px 0px;
+  padding: 0px;
 }
 .message-h3 {
-    padding: 0px;
-    margin: 5px;
+  padding: 0px;
+  margin: 5px;
 }

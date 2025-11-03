@@ -1,28 +1,28 @@
-import { useState, useImperativeHandle  } from 'react'
+import { useState, useImperativeHandle } from "react";
 
 // const ToggleButton = ({ buttonLabel1, buttonLabel2, ref, isVisible, handleVisible, children }) => {
 const ToggleButton = (props) => {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(false);
 
-  const hideWhenVisible = { display: visible ? 'none' : '' }
-  const showWhenVisible = { display: visible ? '' : 'none' }
+  const hideWhenVisible = { display: visible ? "none" : "" };
+  const showWhenVisible = { display: visible ? "" : "none" };
 
   const toggleVisibility = () => {
-    setVisible(!visible)
-  }
+    setVisible(!visible);
+  };
 
   const getVisiblilty = () => {
-    return visible
-  }
+    return visible;
+  };
 
   const onClick = () => {
-    toggleVisibility()
-    props.handleVisible()
-  }
+    toggleVisibility();
+    props.handleVisible();
+  };
 
   useImperativeHandle(props.ref, () => {
-    return { toggleVisibility }
-  })
+    return { toggleVisibility };
+  });
 
   return (
     <div>
@@ -37,7 +37,7 @@ const ToggleButton = (props) => {
         {/* <button onClick={toggleVisibility}>{props.buttonLabel2}</button> */}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ToggleButton
+export default ToggleButton;
