@@ -3,6 +3,7 @@ import Blog from "./components/Blog";
 import ToggleButton from "./components/ToggleButton";
 import BlogForm from "./components/BlogForm";
 import BlogList from "./components/BlogList";
+import MessageBar from "./components/MessageBar";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import "./index.css";
@@ -82,6 +83,7 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password }); //Get user returned with valid id from login form
       blogService.setToken(user.token);
+      console.log(user)
       setUser(user);
       setUsername("");
       setPassword("");
@@ -135,24 +137,6 @@ const App = () => {
     }, 5000);
   };
 
-  const MessageBar = ({ message, type }) => {
-    //Show user messages - type: s = success, f = fail
-    let messageTypeClass = "";
-    if (type === "s") {
-      messageTypeClass = "message-success-div";
-    } else if (type === "f") {
-      messageTypeClass = "message-fail-div";
-    }
-
-    if (message) {
-      return (
-        <div className={messageTypeClass}>
-          <h3 className="message-h3">{message}</h3>
-        </div>
-      );
-    }
-  };
-
   if (user === null) {
     return (
       <div>
@@ -174,7 +158,7 @@ const App = () => {
             <label for="password">
               password{" "}
               <input
-                type="text"
+                type="password"
                 value={password}
                 name={"password"}
                 onChange={({ target }) => setPassword(target.value)}
