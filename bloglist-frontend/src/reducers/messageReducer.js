@@ -1,19 +1,28 @@
-const messageReducer = (state = "", action) => {
-  switch (action.type) {
-    case "SET_MESSAGE":
-      return (state = action.payload);
-    case "CLEAR_MESSAGE":
-      return (state = "");
-    default:
-      return state;
-  }
-};
+import { createSlice } from "@reduxjs/toolkit";
 
-export const setMessage = (message) => {
-  return {
-    type: "SET_MESSAGE",
-    payload: message,
+const messageSlice = createSlice({
+  name: "messages",
+  initialState: { message: "", type: "" },
+  reducers: {
+    setMessage(state, action) {
+      return action.payload;
+    },
+
+    clearMessage(state, action) {
+      return "";
+    },
+  },
+});
+
+export const { setMessage, clearMessage } = messageSlice.actions;
+
+export const doShowMessage = (message, type) => {
+  return async (dispatch) => {
+    await dispatch(setMessage({ message, type }));
+    setTimeout(() => {
+      dispatch(clearMessage());
+    }, 5000);
   };
 };
 
-export default messageReducer;
+export default messageSlice.reducer;

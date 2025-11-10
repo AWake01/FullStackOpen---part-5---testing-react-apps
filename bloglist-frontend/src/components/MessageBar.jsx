@@ -1,4 +1,9 @@
-const MessageBar = ({ message, type }) => {
+import { useDispatch, useSelector } from "react-redux";
+
+// const MessageBar = ({ message, type }) => {
+const MessageBar = () => {
+    const { message, type }  = useSelector(({ messages }) => { return messages })
+
     //Show user messages - type: s = success, f = fail
     let messageTypeClass = "";
     if (type === "s") {

@@ -11,6 +11,9 @@ import axios from "axios";
 //import { jwtDecode } from "jwt-decode";
 //import jwt from "jsonwebtoken"
 
+import { useDispatch, useSelector } from "react-redux";
+import { doShowMessage } from "./reducers/messageReducer";
+
 const App = () => {
   //Login
   const [username, setUsername] = useState([]);
@@ -23,8 +26,12 @@ const App = () => {
   // const [author, setAuthor] = useState([])
   // const [url, setUrl] = useState(null)
   //Message
-  const [message, setMessage] = useState(null);
+  //const [message, setMessage] = useState(null);
   const [messageType, setMessageType] = useState("s"); // s = success, f = fail
+
+  const dispatch = useDispatch()
+  //const message = useSelector(state => state.messages)
+  //console.log(message)
 
   useEffect(() => {
     getAllBlogs();
@@ -38,13 +45,13 @@ const App = () => {
       const user = JSON.parse(loggedInUser);
       setUser(user);
       blogService.setToken(user.token);
-      // if(tokenHasTimedOut()) {  //Check if token has expired and logout
-      //   //console.log("Token expired")
-      //   showMessage("Saved login token has expired", "f")
-      //   window.localStorage.clear()
-      //   setUser(null)
-      // } else {
-      //}
+      if(tokenHasTimedOut()) {  //Check if token has expired and logout
+        //console.log("Token expired")
+        showMessage("Saved login token has expired", "f")
+        window.localStorage.clear()
+        setUser(null)
+      } else {
+      }
     }
   }, []);
 
@@ -90,7 +97,7 @@ const App = () => {
       console.log(`${user.name} logged in`);
       window.localStorage.setItem("currentUser", JSON.stringify(user));
     } catch (exception) {
-      showMessage("Invalid username or password", "f");
+      showMessage("Invalid username or password", "f")
     }
   };
 
@@ -104,14 +111,10 @@ const App = () => {
   const handleAddBlog = (blogObject) => {
     //Called by create button
     blogService.create(blogObject).then((returnedBlog) => {
-      // if(returnedBlog.error) {
-      //   showMessage(`Session expired`, "f")
-      // } else {
-      //setBlogs(blogs.concat(returnedBlog))
       getAllBlogs();
       blogFormRef.current.toggleVisibility();
       console.log(returnedBlog);
-      showMessage("New blog added", "p");
+      showMessage("New blog added", "s")
     });
   };
 
@@ -130,18 +133,19 @@ const App = () => {
 
   const showMessage = (message, type) => {
     //Show message to user - type: s = success, f = fail
-    setMessage(message);
-    setMessageType(type);
-    setTimeout(() => {
-      setMessage(null);
-    }, 5000);
+    //setMessage(message);
+    dispatch(doShowMessage(message, type))
+    // setMessageType(type);
+    // setTimeout(() => {
+    //   setMessage(null);
+    // }, 5000);
   };
 
   if (user === null) {
     return (
       <div>
         <h2>Log in to application</h2>
-        <MessageBar message={message} type={messageType} />
+        <MessageBar/>
         <form onSubmit={handleLogin}>
           <div>
             <label for="username">
@@ -173,7 +177,8 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        <MessageBar message={message} type={messageType} />
+        {/* <MessageBar message={message} type={messageType} /> */}
+        <MessageBar/>
         <div>
           <label>{`${user.name} has logged in `}</label>
           <button type="submit" onClick={handleLogout}>
