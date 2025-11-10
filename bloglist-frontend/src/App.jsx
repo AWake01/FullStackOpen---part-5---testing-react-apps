@@ -131,14 +131,8 @@ const App = () => {
     }
   };
 
-  const showMessage = (message, type) => {
-    //Show message to user - type: s = success, f = fail
-    //setMessage(message);
+  const showMessage = (message, type) => {  //Show message to user - type: s = success, f = fail
     dispatch(doShowMessage(message, type))
-    // setMessageType(type);
-    // setTimeout(() => {
-    //   setMessage(null);
-    // }, 5000);
   };
 
   if (user === null) {
