@@ -13,6 +13,7 @@ import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
 import { doShowMessage } from "./reducers/messageReducer";
+import { doInitilizeBlogs } from "./reducers/blogReducer";
 
 const App = () => {
   //Login
@@ -22,20 +23,14 @@ const App = () => {
   //Blogs
   const [blogs, setBlogs] = useState([]);
   const blogFormRef = useRef();
-  // const [title, setTitle] = useState([])
-  // const [author, setAuthor] = useState([])
-  // const [url, setUrl] = useState(null)
-  //Message
-  //const [message, setMessage] = useState(null);
+
   const [messageType, setMessageType] = useState("s"); // s = success, f = fail
 
   const dispatch = useDispatch()
-  //const message = useSelector(state => state.messages)
-  //console.log(message)
 
-  useEffect(() => {
-    getAllBlogs();
-  }, []);
+  useEffect(() => { //initialize blog store
+    dispatch(doInitilizeBlogs())
+  }, [dispatch]);
 
   useEffect(async () => {
     //Set user intialy from local storage if user was previosly logged in and token is still valid
@@ -45,13 +40,13 @@ const App = () => {
       const user = JSON.parse(loggedInUser);
       setUser(user);
       blogService.setToken(user.token);
-      if(tokenHasTimedOut()) {  //Check if token has expired and logout
-        //console.log("Token expired")
-        showMessage("Saved login token has expired", "f")
-        window.localStorage.clear()
-        setUser(null)
-      } else {
-      }
+      // if(tokenHasTimedOut()) {  //Check if token has expired and logout
+      //   //console.log("Token expired")
+      //   showMessage("Saved login token has expired", "f")
+      //   window.localStorage.clear()
+      //   setUser(null)
+      // } else {
+      // }
     }
   }, []);
 
@@ -108,14 +103,10 @@ const App = () => {
     setUser(null);
   };
 
-  const handleAddBlog = (blogObject) => {
-    //Called by create button
-    blogService.create(blogObject).then((returnedBlog) => {
-      getAllBlogs();
+  const hideBlogForm = () => {
+    //Called by create button on blog form
       blogFormRef.current.toggleVisibility();
-      console.log(returnedBlog);
       showMessage("New blog added", "s")
-    });
   };
 
   const handleDeleteBlog = (blogObject) => {
@@ -171,7 +162,6 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        {/* <MessageBar message={message} type={messageType} /> */}
         <MessageBar/>
         <div>
           <label>{`${user.name} has logged in `}</label>
@@ -186,12 +176,11 @@ const App = () => {
           ref={blogFormRef}
         >
           <BlogForm
-            onSubmit={handleAddBlog}
-            createBlogFunction={handleAddBlog}
+            hideBlogForm={hideBlogForm}
           ></BlogForm>
         </ToggleButton>
         <br />
-        <BlogList blogs={blogs} deleteBlog={handleDeleteBlog}></BlogList>
+        <BlogList deleteBlog={handleDeleteBlog}></BlogList>
       </div>
     );
   }
