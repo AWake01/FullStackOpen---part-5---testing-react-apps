@@ -1,6 +1,8 @@
 import ToggleButton from "./ToggleButton";
 import blogService from "../services/blogs";
 import { useState, useRef, useCallback } from "react";
+import { useDispatch, useSelector } from 'react-redux'
+import { doAddLike, doDeleteBlog } from "../reducers/blogReducer";
 
 const blogStyle = {
   paddingTop: 5,
@@ -63,26 +65,20 @@ const buttonLineStyle = {
   alignItems: "center",
 };
 
-const Blog = ({ blog, deleteBlog }) => {
+const Blog = ({ blogItem }) => {
   const blogRef = useRef();
   const [isActive, setIsActive] = useState(false); //Passed to child and set. Used to show full/summary details
 
-  const [likes, setLikes] = useState(blog.likes);
+  const dispatch = useDispatch()
 
   const handleAddLike = (blogObject) => {
-    //Called by like button
-    const newBlog = blogObject;
-    newBlog.likes += 1;
-
-    blogService.put(newBlog).then((returnedBlog) => {
-      setLikes(returnedBlog.likes);
-    });
+    dispatch(doAddLike(blogObject))
   };
 
   const userCanDelete = (blogObject) => {
     //Called by like button
     const currentUser = JSON.parse(window.localStorage.getItem("currentUser"));
-    if (!blog.user) {
+    if (!blogItem.user) {
       return false;
     }
     return blogObject.user.id === currentUser.id ? true : false;
@@ -90,37 +86,45 @@ const Blog = ({ blog, deleteBlog }) => {
 
   const blogDetails = () => {
     //Called by like button
+
+     const handleDeleteBlog = (blogObject) => {
+        //Called by remove button
+        if (
+          window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
+        ) {
+          console.log("clicked remove");
+
+          dispatch(doDeleteBlog(blogObject))
+        }
+      };
+
     return (
       <div className="blog-details-div">
-        <a style={lineStyle} href={blog.url}>
-          {blog.url}
+        <a style={lineStyle} href={blogItem.url}>
+          {blogItem.url}
         </a>
         <div style={buttonLineStyle}>
-          likes {likes}
+          likes {blogItem.likes}
           <button
             onClick={(e) => {
               e.stopPropagation();
-              handleAddLike(blog);
+              handleAddLike(blogItem);
             }}
           >
             like
           </button>
         </div>
-        {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}
-        {console.log("Blog, ", blog)}
-        {userCanDelete(blog) ? (
+        {blogItem.user ? <i style={lineStyle}>{blogItem.user.username}</i> : null}
+        {console.log("Blog, ", blogItem)}
+        {userCanDelete(blogItem) ? (
           <div>
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteBlog(blog);
-              }}
+              onClick={() => handleDeleteBlog(blogItem)}
             >
               remove
             </button>
           </div>
         ) : null}
-        {/* <div><button onClick={(e) => { e.stopPropagation(); deleteBlog(blog)}}>remove</button></div> */}
       </div>
     );
   };
@@ -137,8 +141,8 @@ const Blog = ({ blog, deleteBlog }) => {
   return (
     <div style={blogStyle} className="blog-div">
       <div style={buttonLineStyle}>
-        <u>{blog.title}</u>
-        <i>{blog.author}</i>
+        <u>{blogItem.title}</u>
+        <i>{blogItem.author}</i>
         <ToggleButton
           buttonLabel1="view"
           buttonLabel2="hide"
@@ -148,64 +152,6 @@ const Blog = ({ blog, deleteBlog }) => {
         ></ToggleButton>
       </div>
       {isActive ? blogDetails() : null}
-    </div>
-  );
-};
-
-const BlogDetailed = ({ blog, deleteBlog }) => {
-  const [likes, setLikes] = useState(blog.likes);
-
-  const handleAddLike = (blogObject) => {
-    //Called by like button
-    const newBlog = blogObject;
-    newBlog.likes += 1;
-
-    blogService.put(newBlog).then((returnedBlog) => {
-      setLikes(returnedBlog.likes);
-    });
-  };
-
-  const userCanDelete = (blogObject) => {
-    //Called by like button
-    const currentUser = JSON.parse(window.localStorage.getItem("currentUser"));
-    if (!blog.user) {
-      return false;
-    }
-    return blogObject.user.id === currentUser.id ? true : false;
-  };
-
-  //stopPropagation() prevents parent 'view' button firing 'like' onClick function (event bubbling)
-  return (
-    <div className="blog-details-div">
-      <a style={lineStyle} href={blog.url}>
-        {blog.url}
-      </a>
-      <div style={buttonLineStyle}>
-        likes {likes}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleAddLike(blog);
-          }}
-        >
-          like
-        </button>
-      </div>
-      {blog.user ? <i style={lineStyle}>{blog.user.username}</i> : null}
-      {console.log("Blog, ", blog)}
-      {userCanDelete(blog) ? (
-        <div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteBlog(blog);
-            }}
-          >
-            remove
-          </button>
-        </div>
-      ) : null}
-      {/* <div><button onClick={(e) => { e.stopPropagation(); deleteBlog(blog)}}>remove</button></div> */}
     </div>
   );
 };

@@ -13,7 +13,7 @@ import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
 import { doShowMessage } from "./reducers/messageReducer";
-import { doInitilizeBlogs } from "./reducers/blogReducer";
+import { doInitilizeBlogs, doDeleteBlog } from "./reducers/blogReducer";
 
 const App = () => {
   //Login
@@ -109,19 +109,6 @@ const App = () => {
       showMessage("New blog added", "s")
   };
 
-  const handleDeleteBlog = (blogObject) => {
-    //Called by remove button
-    if (
-      window.confirm(`Remove blog ${blogObject.title} by ${blogObject.author}?`)
-    ) {
-      console.log("clicked remove");
-
-      blogService.deleteBlog(blogObject).then((returnedBlog) => {
-        getAllBlogs();
-      });
-    }
-  };
-
   const showMessage = (message, type) => {  //Show message to user - type: s = success, f = fail
     dispatch(doShowMessage(message, type))
   };
@@ -180,7 +167,7 @@ const App = () => {
           ></BlogForm>
         </ToggleButton>
         <br />
-        <BlogList deleteBlog={handleDeleteBlog}></BlogList>
+        <BlogList></BlogList>
       </div>
     );
   }

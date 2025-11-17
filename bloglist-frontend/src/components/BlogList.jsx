@@ -12,7 +12,7 @@ const BlogList = ({ deleteBlog }) => {
   return (
     <div>
       {curBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} deleteBlog={deleteBlog} />
+        <Blog key={blog.id} blogItem={blog} />
       ))}
     </div>
   );
