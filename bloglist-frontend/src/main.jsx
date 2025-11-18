@@ -2,14 +2,15 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import messageReducer from './reducers/messageReducer'
 import blogReducer from './reducers/blogReducer'
+import userReducer from './reducers/userReducer'
 import { configureStore } from '@reduxjs/toolkit'
 import { Provider } from 'react-redux'
-import blogs from "./services/blogs";
 
 const store = configureStore({
     reducer: {
         messages: messageReducer,
-        blogs: blogReducer
+        blogs: blogReducer,
+        user: userReducer
     }
 })
 
